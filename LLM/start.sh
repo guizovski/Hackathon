@@ -20,6 +20,7 @@ cleanup() {
   warn "A terminar serviços..."
   [ -n "$TUNNEL_PID" ] && kill "$TUNNEL_PID" 2>/dev/null || true
   docker compose -f "$SCRIPT_DIR/docker-compose.yml" stop backend 2>/dev/null || true
+  pkill -x ollama 2>/dev/null || true
   info "Serviços terminados."
 }
 trap cleanup EXIT INT TERM
@@ -51,17 +52,22 @@ for i in $(seq 1 15); do
   fi
 done
 
-# ─── 3. Verificar modelos Ollama ────────────────────────────────────────────
-for MODEL in tejo qwen2.5:7b; do
-  if ! ollama show "$MODEL" >/dev/null 2>&1; then
-    error "Modelo '$MODEL' não encontrado. Corre:\n  python3 generate_modelfile.py && ollama create tejo -f Modelfile"
-  fi
-done
-info "Modelos Ollama presentes (tejo, qwen2.5:7b)"
+# ─── 3. Verificar modelo Tejo ──────────────────────────────────────────────
+if ! ollama show tejo >/dev/null 2>&1; then
+  error "Modelo 'tejo' não encontrado. Corre:\n  cd $SCRIPT_DIR && python3 generate_modelfile.py && ollama create tejo -f Modelfile"
+fi
+info "Modelo tejo presente"
+
+# ─── 3b. Verificar sitemap ──────────────────────────────────────────────────
+SITEMAP="$SCRIPT_DIR/data/sitemap.json"
+if [ ! -f "$SITEMAP" ]; then
+  error "data/sitemap.json não encontrado. Corre o scraper primeiro:\n  docker compose --profile scrape run scraper"
+fi
+info "Sitemap encontrado ($(python3 -c "import json; d=json.load(open('$SITEMAP')); print(len(d.get('routes',[])))" 2>/dev/null || echo '?') rotas)"
 
 # ─── 4. Iniciar Backend (Docker) ────────────────────────────────────────────
-info "A iniciar backend Docker..."
-docker compose -f "$SCRIPT_DIR/docker-compose.yml" up -d backend
+info "A iniciar backend Docker (rebuild)..."
+docker compose -f "$SCRIPT_DIR/docker-compose.yml" up -d --build backend
 
 # Aguardar backend ficar pronto
 echo -n "    A aguardar backend"

@@ -33,23 +33,26 @@ if %ERRORLEVEL% neq 0 (
 echo.
 echo [✓] Ollama pronto
 
-:: ─── 3. Verificar modelos ───────────────────────────────────────────────────
+:: ─── 3. Verificar modelo Tejo ─────────────────────────────────────────────
 ollama show tejo >nul 2>&1
 if %ERRORLEVEL% neq 0 (
   echo [x] Modelo 'tejo' nao encontrado. Corre:
   echo     python generate_modelfile.py ^&^& ollama create tejo -f Modelfile
   pause & exit /b 1
 )
-ollama show qwen2.5:7b >nul 2>&1
-if %ERRORLEVEL% neq 0 (
-  echo [x] Modelo 'qwen2.5:7b' nao encontrado. Corre: ollama pull qwen2.5:7b
+echo [✓] Modelo tejo presente
+
+:: ─── 3b. Verificar sitemap ─────────────────────────────────────────────────
+if not exist "%SCRIPT_DIR%data\sitemap.json" (
+  echo [x] data\sitemap.json nao encontrado. Corre o scraper primeiro:
+  echo     docker compose --profile scrape run scraper
   pause & exit /b 1
 )
-echo [✓] Modelos Ollama presentes (tejo, qwen2.5:7b^)
+echo [✓] Sitemap encontrado
 
 :: ─── 4. Iniciar Backend Docker ──────────────────────────────────────────────
-echo [✓] A iniciar backend Docker...
-docker compose -f "%SCRIPT_DIR%docker-compose.yml" up -d backend
+echo [✓] A iniciar backend Docker (rebuild)...
+docker compose -f "%SCRIPT_DIR%docker-compose.yml" up -d --build backend
 if %ERRORLEVEL% neq 0 (
   echo [x] Erro ao iniciar Docker. Verifica se o Docker Desktop esta a correr.
   pause & exit /b 1
@@ -108,4 +111,5 @@ pause
 :: Cleanup
 docker compose -f "%SCRIPT_DIR%docker-compose.yml" stop backend >nul 2>&1
 taskkill /f /im cloudflared.exe >nul 2>&1
+taskkill /f /im ollama.exe >nul 2>&1
 echo [✓] Servicos terminados.

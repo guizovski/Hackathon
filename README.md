@@ -1,6 +1,16 @@
-# CLIP REvived
+# CLIP REvived by Team10
 
 Assistente académico para o portal CLIP da FCT-UNL. Faz perguntas em linguagem natural — horários, notas, propinas, testes — e o modelo navega o CLIP com o teu cookie de sessão.
+
+# Descrição do problema e da solução:
+
+Muitos estudantes que utilizam o CLIP partilham sempre o mesmo pensamento: o CLIP é muito lento, com múltiplas subárvores e por vezes difícil de navegar, como podemos observar com a nossa recolha de dados. Com a quantidade de vezes que um aluno precisa de aceder ao CLIP ao longo do ano, estas demoras de resposta acumulam-se.
+
+# A solução:
+
+O nosso chatbot torna o CLIP mais prático e eficiente, pois não é necessário saltar de subpágina em subpágina — subpáginas que por sua vez demoram tempo a carregar —, tornando o processo de navegação muito mais rápido e eficaz. Não só a navegação: caso apenas necessitemos de informação, a LLM também a pode disponibilizar diretamente, sem ser necessário navegar pelo website.
+
+Ao invés de mudarmos o CLIP — um sistema antiquado e com muitos problemas, o que tornaria a sua modificação e transição para uma alternativa melhor bastante complicada —, construímos por cima dele, tornando-o o mais prático possível sem alterar a sua estrutura base.
 
 ---
 

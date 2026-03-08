@@ -125,12 +125,27 @@ def build_few_shot_section(sitemap: dict) -> str:
     for pergunta, url in examples:
         lines.append(f'  P: "{pergunta}"')
         if url == "__action__":
-            lines.append('  R: {"routes_to_fetch": [], "reasoning": "acao nao suportada"}')
+            lines.append('  R: {"intent": "unsupported_action", "routes_to_fetch": [], "cadeira": "", "reasoning": "acao nao suportada"}')
         else:
-            lines.append(f'  R: {{"routes_to_fetch": ["{url}"], "reasoning": "..."}}')
+            lines.append(f'  R: {{"intent": "read", "routes_to_fetch": ["{url}"], "cadeira": "", "reasoning": "..."}}')
         lines.append("")
     if not examples:
         lines.append("  (sem exemplos)")
+    return "\n".join(lines)
+
+
+def _few_shot_messages(sitemap: dict) -> str:
+    """Gera blocos MESSAGE user/assistant para few-shot no Modelfile."""
+    examples = load_few_shot(sitemap)
+    lines = []
+    for pergunta, url in examples:
+        if url == "__action__":
+            answer = '{"intent": "unsupported_action", "routes_to_fetch": [], "cadeira": "", "reasoning": "acao nao suportada"}'
+        else:
+            answer = f'{{"intent": "read", "routes_to_fetch": ["{url}"], "cadeira": "", "reasoning": "..."}}'
+        lines.append(f'MESSAGE user "{pergunta}"')
+        lines.append(f'MESSAGE assistant "{answer}"')
+        lines.append("")
     return "\n".join(lines)
 
 
@@ -138,21 +153,34 @@ def generate_modelfile(sitemap: dict, base_model: str) -> str:
     specific_rules = build_specific_rules(sitemap)
 
     system_prompt = f"""És um assistente especializado no portal académico CLIP da FCT-UNL.
-O teu único objetivo é: dada uma pergunta do utilizador, devolver um JSON com as URL(s) do CLIP a consultar.
+O teu objetivo é: dada uma pergunta do utilizador, identificar a intenção e devolver um JSON com as URL(s) do CLIP a consultar.
 
 RESPONDE SEMPRE E APENAS com JSON neste formato exato (sem texto extra, sem markdown):
-{{"routes_to_fetch": ["url_completa"], "reasoning": "uma linha"}}
+{{"intent": "read", "routes_to_fetch": ["url_completa"], "cadeira": "", "reasoning": "uma linha"}}
+
+INTENTS POSSÍVEIS:
+- "read"               → pergunta de leitura de dados (padrão)
+- "ics_export"         → exportar horário (.ics / Google Calendar / Outlook / Apple Calendar / importar horário)
+                         routes_to_fetch deve ser []
+- "enroll_test"        → inscrever-se num teste ("inscreve-me", "quero inscrever-me no teste de X")
+                         routes_to_fetch deve ser []
+                         cadeira: nome da cadeira mencionada, "" se não especificado, "__todos__" se quer todos
+- "unsupported_action" → acção de escrita não suportada (submeter, cancelar, apagar, matricular, etc.)
+                         routes_to_fetch deve ser []
 
 REGRAS CRÍTICAS:
 1. Usa as URLs das regras abaixo EXACTAMENTE como aparecem — encoding Latin-1 (%E9, %E7%E3o, %ED, etc).
 2. NUNCA inventes URLs nem parâmetros — apenas usa as que estão listadas abaixo.
 3. NUNCA uses encoding UTF-8 (%C3%A9, %C3%A7, etc) — o CLIP só aceita Latin-1.
 4. Responde APENAS com o JSON. Nenhum texto antes ou depois.
-5. Se a pergunta não corresponder a nenhuma regra abaixo, devolve {{"routes_to_fetch": [], "reasoning": "nao sei"}}.
+5. Se a pergunta não corresponder a nenhuma regra abaixo, devolve {{"intent": "read", "routes_to_fetch": [], "cadeira": "", "reasoning": "nao sei"}}.
 6. Responde SEMPRE em português europeu (pt-PT): "tu/tens/podes" — NUNCA "você/tem/pode".
+7. CRÍTICO: routes_to_fetch deve conter APENAS strings que comecem exactamente com "https://clip.fct.unl.pt". NUNCA coloques rótulos, emojis, nomes de páginas, botões ou qualquer texto livre em routes_to_fetch. Se colocares algo que não seja uma URL https:// completa, a resposta é inválida.
 {specific_rules}"""
 
     escaped = system_prompt.replace('"""', '\\"\\"\\"')
+
+    few_shot = build_few_shot_section(sitemap)
 
     return f'''FROM {base_model}
 
@@ -163,6 +191,10 @@ PARAMETER num_ctx 16384
 SYSTEM """
 {escaped}
 """
+
+# ── Exemplos few-shot ─────────────────────────────────────────────────────────
+# Formato: MESSAGE user "pergunta" / MESSAGE assistant "{{json}}"
+{_few_shot_messages(sitemap)}
 '''
 
 

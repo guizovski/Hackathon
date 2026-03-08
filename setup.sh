@@ -157,19 +157,23 @@ setup_tejo_model() {
     info "qwen2.5:7b já presente"
   fi
 
-  # Gerar Modelfile e criar modelo tejo
-  if ! ollama show tejo &>/dev/null 2>&1; then
-    warn "A gerar Modelfile e criar modelo tejo..."
-    cd "$LLM_DIR"
-    python3 generate_modelfile.py
-    ollama create tejo -f Modelfile
-    info "Modelo tejo criado"
-  else
-    info "Modelo tejo já presente"
+  # Gerar Modelfile e (re)criar modelo tejo — sempre, para garantir que está actualizado
+  warn "A gerar Modelfile e criar modelo tejo..."
+  cd "$LLM_DIR"
+  python3 generate_modelfile.py
+  ollama create tejo -f Modelfile
+  info "Modelo tejo criado/actualizado"
+
+  # Verificar sitemap
+  if [ ! -f "$LLM_DIR/data/sitemap.json" ]; then
+    warn "data/sitemap.json não encontrado — o backend não vai funcionar sem ele."
+    warn "Depois do setup, corre: docker compose --profile scrape run scraper"
   fi
 
   # Parar Ollama se foi arrancado por este script
-  $OLLAMA_STARTED && pkill -x ollama 2>/dev/null || true
+  if $OLLAMA_STARTED; then
+    pkill -x ollama 2>/dev/null || true
+  fi
 }
 
 # ─── Main ─────────────────────────────────────────────────────────────────────
@@ -190,5 +194,5 @@ echo ""
 echo -e "${GREEN}✅  Setup concluído!${NC}"
 echo ""
 echo "  Para arrancar o servidor:"
-echo -e "  ${YELLOW}cd $(dirname "${BASH_SOURCE[0]}") && ./start.sh${NC}"
+echo -e "  ${YELLOW}cd LLM && ./start.sh${NC}"
 echo ""

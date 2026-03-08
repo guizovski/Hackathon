@@ -84,41 +84,50 @@ echo.
 echo ▶ Configurar modelo Tejo
 ollama show tejo >nul 2>&1
 if %ERRORLEVEL% equ 0 (
-  echo [✓] Modelo tejo ja presente
+  echo [✓] Modelo tejo ja existe - a regenerar para garantir actualizacao...
 ) else (
-  :: Arrancar Ollama temporariamente se necessario
-  tasklist /fi "imagename eq ollama.exe" 2>nul | find /i "ollama.exe" >nul
+  echo [!] Modelo tejo nao encontrado - a criar...
+)
+
+:: Arrancar Ollama temporariamente se necessario
+tasklist /fi "imagename eq ollama.exe" 2>nul | find /i "ollama.exe" >nul
+if %ERRORLEVEL% neq 0 (
+  start /min "" ollama serve
+  echo|set /p="    A aguardar Ollama"
+  :wait_ollama_setup
+  curl -sf http://localhost:11434/api/tags >nul 2>&1
   if %ERRORLEVEL% neq 0 (
-    start /min "" ollama serve
-    echo|set /p="    A aguardar Ollama"
-    :wait_ollama_setup
-    curl -sf http://localhost:11434/api/tags >nul 2>&1
-    if %ERRORLEVEL% neq 0 (
-      echo|set /p="."
-      timeout /t 2 /nobreak >nul
-      goto wait_ollama_setup
-    )
-    echo.
+    echo|set /p="."
+    timeout /t 2 /nobreak >nul
+    goto wait_ollama_setup
   )
-  :: Descarregar modelo base se necessario
-  ollama show qwen2.5:7b >nul 2>&1
-  if %ERRORLEVEL% neq 0 (
-    echo [!] A descarregar qwen2.5:7b ^(~4.7 GB, pode demorar^)...
-    ollama pull qwen2.5:7b
-  ) else (
-    echo [✓] qwen2.5:7b ja presente
-  )
-  :: Gerar Modelfile e criar modelo tejo
-  echo [!] A gerar Modelfile...
-  python "%LLM_DIR%\generate_modelfile.py"
-  echo [!] A criar modelo tejo...
-  ollama create tejo -f "%LLM_DIR%\Modelfile"
-  if !ERRORLEVEL! equ 0 (
-    echo [✓] Modelo tejo criado
-  ) else (
-    echo [✗] Falha ao criar modelo tejo.
-    set "ERRORS=1"
-  )
+  echo.
+)
+
+:: Descarregar modelo base se necessario
+ollama show qwen2.5:7b >nul 2>&1
+if %ERRORLEVEL% neq 0 (
+  echo [!] A descarregar qwen2.5:7b ^(~4.7 GB, pode demorar^)...
+  ollama pull qwen2.5:7b
+) else (
+  echo [✓] qwen2.5:7b ja presente
+)
+
+:: Gerar Modelfile e criar modelo tejo (sempre, para garantir actualizacao)
+echo [!] A gerar Modelfile e a criar modelo tejo...
+python "%LLM_DIR%\generate_modelfile.py"
+ollama create tejo -f "%LLM_DIR%\Modelfile"
+if !ERRORLEVEL! equ 0 (
+  echo [✓] Modelo tejo criado/actualizado
+) else (
+  echo [✗] Falha ao criar modelo tejo.
+  set "ERRORS=1"
+)
+
+:: Verificar sitemap
+if not exist "%LLM_DIR%\data\sitemap.json" (
+  echo [!] data\sitemap.json nao encontrado - o backend nao vai funcionar sem ele.
+  echo     Depois do setup, corre: docker compose --profile scrape run scraper
 )
 
 :: ─── 7. Resultado ────────────────────────────────────────────────────────────

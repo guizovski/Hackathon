@@ -327,29 +327,33 @@
     const cookieResult = await chrome.runtime.sendMessage({ type: 'GET_COOKIES' });
     const sessionCookie = cookieResult?.cookie || '';
 
-    // Step 2: fetch LLM directly from content script (no service worker timeout)
+    // Step 2: proxy the LLM fetch through the background worker to avoid
+    // mixed-content blocks (CLIP is HTTPS; localhost backend is HTTP).
     try {
-      const response = await fetch(`${serverBaseUrl}/chat`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+      const result = await chrome.runtime.sendMessage({
+        type: 'FETCH_CHAT',
+        url: `${serverBaseUrl}/chat`,
+        body: {
           question: text,
           session_cookie: sessionCookie,
           student_id: aluno || null,
           conversation_history: conversationHistory.slice(-10),
-        }),
+        },
       });
 
       hideTyping();
       isLoading = false;
       sendBtn.disabled = false;
 
-      if (!response.ok) {
-        const err = await response.json().catch(() => null);
-        addMessage('assistant', `❌ Erro do servidor: HTTP ${response.status}${err?.detail ? ' — ' + err.detail : ''}`, true);
+      if (!result.ok) {
+        const detail = result.data?.detail;
+        const msg = result.error
+          ? `❌ Não foi possível contactar o servidor: ${result.error}`
+          : `❌ Erro do servidor: HTTP ${result.status}${detail ? ' — ' + detail : ''}`;
+        addMessage('assistant', msg, true);
         conversationHistory.pop();
       } else {
-        const data = await response.json();
+        const data = result.data;
         if (data.ics_data) triggerICSDownload(data.ics_data);
         const reply = data.answer || 'Não consegui gerar uma resposta.';
         const routes = Array.isArray(data.routes_consulted)
