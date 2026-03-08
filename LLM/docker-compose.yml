@@ -1,0 +1,37 @@
+services:
+
+  # ─── 1. Scraper (mapeia estrutura do CLIP) ────────────────────────────────
+  scraper:
+    build:
+      context: ./scraper
+    container_name: clip_scraper
+    volumes:
+      - ./data:/app/data
+    environment:
+      - CLIP_BASE_URL=https://clip.fct.unl.pt
+      - OUTPUT_PATH=/app/data/sitemap.json
+      - CLIP_USER=${CLIP_USER:-}
+      - CLIP_PASS=${CLIP_PASS:-}
+      - MAX_PAGES=2000
+      - MAX_PER_PATTERN=5
+      - REQUEST_DELAY=1
+    profiles: ["scrape"]
+
+  # ─── 3. Backend (FastAPI) ─────────────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+    container_name: clip_backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/data
+    environment:
+      - OLLAMA_URL=http://host.docker.internal:11434
+      - CLIP_BASE_URL=https://clip.fct.unl.pt
+      - SITEMAP_PATH=/app/data/sitemap.json
+      - LLM_MODEL=tejo
+      - ROUTING_MODEL=tejo
+      - INTERPRET_MODEL=qwen2.5:7b
+

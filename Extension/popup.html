@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CLIP Assistant</title>
+  <link rel="stylesheet" href="css/popup.css" />
+</head>
+
+<body>
+  <div class="popup-root">
+
+    <!-- Header -->
+    <header class="popup-header">
+      <div class="popup-avatar">🎓</div>
+      <div class="popup-header-text">
+        <strong>CLIP SUCKS</strong>
+        <span class="popup-badge">Tejo</span>
+      </div>
+    </header>
+
+    <!-- Status bar -->
+    <div class="popup-status">
+      <div id="statusBadge" class="status-badge inactive"></div>
+      <span id="statusText" class="status-text">Não configurado</span>
+    </div>
+
+    <!-- Config inputs -->
+    <div class="popup-body">
+
+      <!-- LLM Server URL -->
+      <label class="popup-label" for="serverUrl">URL do Servidor Tejo</label>
+      <input type="text" id="serverUrl" class="popup-input" placeholder="https://abc.cfargotunnel.com"
+        autocomplete="off" spellcheck="false" />
+      <p class="popup-hint">
+        URL do túnel Cloudflare ou servidor local (ex: http://localhost:8000)
+      </p>
+
+    </div>
+
+    <!-- Toast -->
+    <div id="message" class="message" style="display:none"></div>
+
+    <!-- Save -->
+    <footer class="popup-footer">
+      <button id="saveBtn" class="popup-save-btn">Guardar</button>
+    </footer>
+
+  </div>
+  <script src="popup.js"></script>
+</body>
+
+</html>

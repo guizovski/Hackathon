@@ -1,0 +1,40 @@
+/* ============================================================
+   CLIP Assistant — Design Tokens
+   ============================================================ */
+
+:root {
+  /* Backgrounds */
+  --clip-bg-base: #0e0f11;
+  /* messages area                    */
+  --clip-bg-surface: #16181c;
+  /* header, input area, suggestions  */
+  --clip-bg-elevated: #1e2128;
+  /* assistant bubbles, inputs        */
+
+  /* Borders */
+  --clip-border: #2a2d35;
+
+  /* Accent */
+  --clip-accent: #00c896;
+  --clip-accent-dim: rgba(0, 200, 150, 0.12);
+
+  /* Text */
+  --clip-text: #e8eaf0;
+  --clip-text-muted: #7a7f8e;
+
+  /* Special states */
+  --clip-user-bg: #1a2a24;
+  /* user bubble background           */
+  --clip-error: #ff5f5f;
+
+  /* Shape */
+  --clip-radius: 14px;
+  --clip-radius-sm: 8px;
+  --clip-radius-pill: 100px;
+
+  /* Depth */
+  --clip-shadow: 0 24px 64px rgba(0, 0, 0, 0.65);
+
+  /* Typography */
+  --clip-font: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+}

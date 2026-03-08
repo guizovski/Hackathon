@@ -1,0 +1,45 @@
+{
+  "manifest_version": 3,
+  "name": "Tejo",
+  "version": "1.0.0",
+  "description": "Chatbot para ajudar estudantes a navegar o CLIP da FCT-UNL",
+  "permissions": [
+    "activeTab",
+    "storage",
+    "scripting",
+    "cookies"
+  ],
+  "host_permissions": [
+    "https://clip.fct.unl.pt/*",
+    "*://*/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://clip.fct.unl.pt/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "css": [
+        "css/variables.css",
+        "css/base.css",
+        "css/toggle.css",
+        "css/window.css",
+        "css/header.css",
+        "css/context-bar.css",
+        "css/messages.css",
+        "css/suggestions.css",
+        "css/input.css",
+        "css/typing.css"
+      ],
+      "run_at": "document_end"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  }
+}

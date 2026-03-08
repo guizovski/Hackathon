@@ -1,0 +1,45 @@
+/* ============================================================
+   CLIP Assistant — Toggle Button (FAB)
+   ============================================================ */
+
+#clip-chatbot-toggle {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 2147483646;
+
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: none;
+
+  background: var(--clip-accent);
+  color: #fff;
+  font-size: 24px;
+  line-height: 1;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 20px rgba(0, 200, 150, 0.4);
+}
+
+#clip-chatbot-toggle:hover {
+  transform: scale(1.07);
+  box-shadow: 0 6px 28px rgba(0, 200, 150, 0.55);
+}
+
+/* Unread badge */
+#clip-chatbot-toggle .badge {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 9px;
+  height: 9px;
+  background: var(--clip-error);
+  border-radius: 50%;
+  border: 2px solid var(--clip-bg-base);
+}

@@ -1,0 +1,31 @@
+/* ============================================================
+   CLIP Assistant — Base Reset
+   Scoped entirely under #clip-assistant-root to avoid
+   polluting the host page styles.
+   ============================================================ */
+
+#clip-assistant-root,
+#clip-assistant-root * {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: var(--clip-font);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#clip-assistant-root button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: inherit;
+}
+
+#clip-assistant-root a {
+  color: var(--clip-accent);
+  text-decoration: none;
+}
+
+#clip-assistant-root a:hover {
+  text-decoration: underline;
+}

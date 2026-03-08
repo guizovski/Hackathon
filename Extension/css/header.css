@@ -1,0 +1,100 @@
+/* ============================================================
+   CLIP Assistant — Header
+   ============================================================ */
+
+#clip-chatbot-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 13px 16px;
+  background: var(--clip-bg-surface);
+  border-bottom: 1px solid var(--clip-border);
+  flex-shrink: 0;
+  gap: 8px;
+}
+
+/* Left cluster: avatar + title */
+.clip-chatbot-header-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.clip-chatbot-avatar {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--clip-accent-dim);
+  border: 1.5px solid var(--clip-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+}
+
+.clip-chatbot-title {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.clip-chatbot-title strong {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--clip-text);
+  letter-spacing: 0.1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.clip-chatbot-title span {
+  font-size: 9.5px;
+  font-weight: 500;
+  color: var(--clip-text-muted);
+  letter-spacing: 0.65px;
+  text-transform: uppercase;
+}
+
+/* Right cluster: status + close */
+.clip-chatbot-online {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--clip-text-muted);
+  white-space: nowrap;
+}
+
+.clip-chatbot-online-dot {
+  width: 7px;
+  height: 7px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--clip-accent);
+  box-shadow: 0 0 7px var(--clip-accent);
+}
+
+#clip-chatbot-close {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  border-radius: var(--clip-radius-sm);
+  border: 1px solid var(--clip-border);
+  background: transparent;
+  color: var(--clip-text-muted);
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+#clip-chatbot-close:hover {
+  background: var(--clip-bg-elevated);
+  color: var(--clip-text);
+}

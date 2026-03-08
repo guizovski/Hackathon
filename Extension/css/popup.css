@@ -1,0 +1,298 @@
+/* ============================================================
+   CLIP Assistant — Popup
+   Same color system as the content script.
+   ============================================================ */
+
+:root {
+  --clip-bg-base: #0e0f11;
+  --clip-bg-surface: #16181c;
+  --clip-bg-elevated: #1e2128;
+  --clip-border: #2a2d35;
+  --clip-accent: #00c896;
+  --clip-accent-dim: rgba(0, 200, 150, 0.12);
+  --clip-text: #e8eaf0;
+  --clip-text-muted: #7a7f8e;
+  --clip-error: #ff5f5f;
+  --clip-font: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  width: 300px;
+  background: var(--clip-bg-base);
+  color: var(--clip-text);
+  font-family: var(--clip-font);
+  font-size: 13px;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Header ── */
+.popup-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  background: var(--clip-bg-surface);
+  border-bottom: 1px solid var(--clip-border);
+}
+
+.popup-avatar {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--clip-accent-dim);
+  border: 1.5px solid var(--clip-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+
+.popup-header-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.popup-header-text strong {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--clip-text);
+  white-space: nowrap;
+}
+
+/* Model badge */
+.popup-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 7px;
+  background: var(--clip-bg-surface);
+  border: 1px solid var(--clip-border);
+  border-radius: 100px;
+  font-size: 9.5px;
+  font-weight: 500;
+  letter-spacing: 0.4px;
+  color: var(--clip-text-muted);
+  text-transform: uppercase;
+  width: fit-content;
+}
+
+/* ── Status row ── */
+.popup-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: var(--clip-accent-dim);
+  border-bottom: 1px solid var(--clip-border);
+}
+
+.status-badge {
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+  border-radius: 50%;
+}
+
+.status-badge.active {
+  background: var(--clip-accent);
+  box-shadow: 0 0 7px var(--clip-accent);
+}
+
+.status-badge.inactive {
+  background: var(--clip-text-muted);
+}
+
+.status-text {
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--clip-accent);
+}
+
+/* ── Body ── */
+.popup-body {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.popup-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--clip-text-muted);
+}
+
+.popup-input {
+  width: 100%;
+  background: var(--clip-bg-elevated);
+  border: 1px solid var(--clip-border);
+  border-radius: 8px;
+  padding: 9px 12px;
+  color: var(--clip-text);
+  font-size: 12.5px;
+  font-family: 'IBM Plex Mono', 'Courier New', monospace;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.popup-input::placeholder {
+  color: var(--clip-text-muted);
+}
+
+.popup-input:focus {
+  border-color: var(--clip-accent);
+  box-shadow: 0 0 0 3px var(--clip-accent-dim);
+}
+
+.popup-hint {
+  font-size: 11px;
+  color: var(--clip-text-muted);
+  line-height: 1.5;
+}
+
+.popup-hint a {
+  color: var(--clip-accent);
+  text-decoration: none;
+}
+
+.popup-hint a:hover {
+  text-decoration: underline;
+}
+
+/* ── Toast message ── */
+.message {
+  margin: 0 16px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 11.5px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.message.success {
+  background: var(--clip-accent-dim);
+  border: 1px solid var(--clip-accent);
+  color: var(--clip-accent);
+}
+
+.message.error {
+  background: rgba(255, 95, 95, 0.1);
+  border: 1px solid rgba(255, 95, 95, 0.3);
+  color: var(--clip-error);
+}
+
+/* ── Footer ── */
+.popup-footer {
+  padding: 12px 16px 16px;
+}
+
+/* ── Divider ── */
+.popup-divider {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--clip-text-muted);
+  font-size: 11px;
+  padding: 4px 0;
+}
+
+.popup-divider::before,
+.popup-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--clip-border);
+}
+
+/* ── Toggle row ── */
+.popup-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 0 2px;
+  border-top: 1px solid var(--clip-border);
+  margin-top: 4px;
+}
+
+.popup-toggle {
+  position: relative;
+  flex-shrink: 0;
+  width: 36px;
+  height: 20px;
+  cursor: pointer;
+}
+
+.popup-toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+
+.popup-toggle-track {
+  position: absolute;
+  inset: 0;
+  background: var(--clip-bg-elevated);
+  border: 1px solid var(--clip-border);
+  border-radius: 100px;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.popup-toggle-track::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 14px;
+  height: 14px;
+  background: var(--clip-text-muted);
+  border-radius: 50%;
+  transition: transform 0.2s, background 0.2s;
+}
+
+.popup-toggle input:checked + .popup-toggle-track {
+  background: var(--clip-accent-dim);
+  border-color: var(--clip-accent);
+}
+
+.popup-toggle input:checked + .popup-toggle-track::after {
+  background: var(--clip-accent);
+  transform: translateX(16px);
+}
+
+
+.popup-save-btn {
+  width: 100%;
+  padding: 9px;
+  background: var(--clip-accent);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: var(--clip-font);
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.popup-save-btn:hover {
+  background: #00dea8;
+  transform: translateY(-1px);
+}
+
+.popup-save-btn:active {
+  transform: translateY(0);
+}

@@ -1,0 +1,37 @@
+/* ============================================================
+   CLIP Assistant — Chat Window
+   ============================================================ */
+
+#clip-chatbot-window {
+  position: fixed;
+  bottom: 88px;
+  right: 24px;
+  z-index: 2147483645;
+
+  width: 380px;
+  height: 600px;
+  max-height: calc(100vh - 112px);
+
+  display: flex;
+  flex-direction: column;
+
+  background: var(--clip-bg-base);
+  border: 1px solid var(--clip-border);
+  border-radius: var(--clip-radius);
+  overflow: hidden;
+
+  box-shadow: var(--clip-shadow);
+
+  /* Hidden by default — shown via .open */
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(14px) scale(0.97);
+  transform-origin: bottom right;
+  transition: opacity 0.22s ease, transform 0.22s ease;
+}
+
+#clip-chatbot-window.open {
+  opacity: 1;
+  pointer-events: all;
+  transform: translateY(0) scale(1);
+}

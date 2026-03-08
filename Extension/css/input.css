@@ -1,0 +1,75 @@
+/* ============================================================
+   CLIP Assistant — Input Area
+   ============================================================ */
+
+#clip-chatbot-input-area {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  padding: 10px 12px;
+  background: var(--clip-bg-surface);
+  border-top: 1px solid var(--clip-border);
+  flex-shrink: 0;
+}
+
+#clip-chatbot-input {
+  flex: 1;
+  resize: none;
+  background: var(--clip-bg-elevated);
+  border: 1px solid var(--clip-border);
+  border-radius: var(--clip-radius-sm);
+  padding: 9px 12px;
+  color: var(--clip-text);
+  font-size: 13px;
+  line-height: 1.5;
+  font-family: var(--clip-font);
+  outline: none;
+  min-height: 36px;
+  max-height: 100px;
+  overflow-y: auto;
+  transition: border-color 0.15s ease;
+
+  scrollbar-width: thin;
+  scrollbar-color: var(--clip-border) transparent;
+}
+
+#clip-chatbot-input::placeholder {
+  color: var(--clip-text-muted);
+}
+
+#clip-chatbot-input:focus {
+  border-color: var(--clip-accent);
+  box-shadow: 0 0 0 3px var(--clip-accent-dim);
+}
+
+/* Send button */
+#clip-chatbot-send {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+
+  border-radius: var(--clip-radius-sm);
+  border: none;
+  background: var(--clip-accent);
+  color: #fff;
+  font-size: 15px;
+  line-height: 1;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transition: background 0.15s ease, transform 0.12s ease;
+}
+
+#clip-chatbot-send:hover:not(:disabled) {
+  background: #00dea8;
+  transform: scale(1.06);
+}
+
+#clip-chatbot-send:disabled {
+  background: var(--clip-bg-elevated);
+  color: var(--clip-text-muted);
+  cursor: not-allowed;
+  transform: none;
+}

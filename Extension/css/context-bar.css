@@ -1,0 +1,30 @@
+/* ============================================================
+   CLIP Assistant — Context Bar
+   ============================================================ */
+
+#clip-page-context {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  background: var(--clip-accent-dim);
+  border-bottom: 1px solid var(--clip-border);
+  flex-shrink: 0;
+
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--clip-accent);
+  letter-spacing: 0.2px;
+}
+
+#clip-page-context>span:first-child {
+  flex-shrink: 0;
+  font-size: 12px;
+}
+
+#clip-page-label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--clip-accent);
+}
