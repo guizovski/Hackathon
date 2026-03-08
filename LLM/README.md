@@ -1,6 +1,6 @@
 # CLIP Assistant — Backend
 
-Chatbot para o portal académico CLIP da FCT-UNL. Faz perguntas em linguagem natural e o LLM navega o CLIP com o teu cookie de sessão.
+Chatbot para o portal académico CLIP da FCT-UNL. Faz perguntas em linguagem natural e o modelo navega o CLIP com o teu cookie de sessão.
 
 ---
 
@@ -8,15 +8,16 @@ Chatbot para o portal académico CLIP da FCT-UNL. Faz perguntas em linguagem nat
 
 - [Docker + Docker Compose](https://docs.docker.com/get-docker/)
 - [Ollama](https://ollama.com) instalado localmente
-- [cloudflared](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/downloads/) (para expor ao exterior)
+- Python 3.9+
 
-Modelos necessários (instalar uma vez):
+> Para expor ao exterior instala também o [cloudflared](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/downloads/) — o `start.sh` usa-o automaticamente se estiver disponível.
+
+Modelos necessários (instalar uma vez — o `setup.sh`/`setup.bat` faz isto automaticamente):
 ```bash
 # 1. Descarrega o modelo base
 ollama pull qwen2.5:7b
 
 # 2. Gera o Modelfile com o sitemap embutido
-cd /caminho/para/Hackathon/LLM
 python3 generate_modelfile.py
 
 # 3. Cria o modelo personalizado no Ollama
@@ -33,37 +34,18 @@ ollama list
 
 ## Arrancar o servidor
 
-Precisas de **3 terminais** abertos em simultâneo, por esta ordem:
-
-### Terminal 1 — Ollama
 ```bash
-ollama serve
+./start.sh
 ```
 
-### Terminal 2 — Backend
-```bash
-cd /caminho/para/Hackathon/LLM
-docker compose up backend
-```
+O script arranca Ollama, o backend Docker e (se `cloudflared` estiver instalado) um tunnel público. No final mostra o URL a usar na extensão Chrome.
 
-Quando vires `"X routes loaded"` o backend está pronto. Para verificar:
+Para terminar: **Ctrl+C**
+
+Para verificar que o backend está a correr:
 ```bash
 curl http://localhost:8000/health
 ```
-
-### Terminal 3 — Túnel público (Cloudflare)
-```bash
-cloudflared tunnel --url http://127.0.0.1:8000 --protocol http2
-```
-
-O terminal mostra o URL público, por exemplo:
-```
-https://xxxx-xxxx-xxxx.trycloudflare.com
-```
-
-Copia esse URL para a extensão Chrome (ícone da extensão → campo do servidor → Guardar).
-
-> ⚠️ O URL muda cada vez que reinicias o túnel. Para URL fixo, cria conta em cloudflare.com e usa `cloudflared tunnel login`.
 
 ---
 

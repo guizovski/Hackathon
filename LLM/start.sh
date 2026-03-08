@@ -13,6 +13,7 @@ warn()    { echo -e "${YELLOW}[!]${NC} $*"; }
 error()   { echo -e "${RED}[✗]${NC} $*"; exit 1; }
 
 TUNNEL_PID=""
+OLLAMA_PID=""
 
 cleanup() {
   echo ""
@@ -24,14 +25,14 @@ cleanup() {
 trap cleanup EXIT INT TERM
 
 # ─── 1. Verificar dependências ──────────────────────────────────────────────
-command -v ollama       >/dev/null 2>&1 || error "ollama não encontrado. Instala em https://ollama.com"
-command -v docker       >/dev/null 2>&1 || error "docker não encontrado."
-command -v cloudflared  >/dev/null 2>&1 || error "cloudflared não encontrado. Instala em https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/downloads/"
+command -v ollama >/dev/null 2>&1 || error "ollama não encontrado. Instala em https://ollama.com"
+command -v docker >/dev/null 2>&1 || error "docker não encontrado."
 
 # ─── 2. Iniciar Ollama ──────────────────────────────────────────────────────
 if ! pgrep -x ollama >/dev/null 2>&1; then
   info "A iniciar ollama serve..."
   ollama serve &>/tmp/ollama.log &
+  OLLAMA_PID=$!
 fi
 
 # Aguardar a API do Ollama ficar pronta
@@ -78,35 +79,41 @@ for i in $(seq 1 30); do
   fi
 done
 
-# ─── 5. Iniciar Cloudflare Tunnel ───────────────────────────────────────────
-info "A iniciar Cloudflare Tunnel..."
-rm -f /tmp/cloudflared.log
-cloudflared tunnel --url http://127.0.0.1:8000 --protocol http2 >/tmp/cloudflared.log 2>&1 &
-TUNNEL_PID=$!
-
-# Extrair URL do tunnel
-echo -n "    A aguardar URL do tunnel"
-TUNNEL_URL=""
-for i in $(seq 1 30); do
-  TUNNEL_URL=$(grep -oE 'https://[a-zA-Z0-9-]+\.trycloudflare\.com' /tmp/cloudflared.log 2>/dev/null | head -1 || true)
-  if [ -n "$TUNNEL_URL" ]; then
-    break
-  fi
-  echo -n "."
-  sleep 2
-done
 echo ""
 
-if [ -n "$TUNNEL_URL" ]; then
+# ─── 5. Tunnel opcional (cloudflared) ─────────────────────────────────────────
+SERVER_URL="http://localhost:8000"
+if command -v cloudflared >/dev/null 2>&1; then
+  info "cloudflared encontrado — a iniciar tunnel público..."
+  rm -f /tmp/cloudflared.log
+  cloudflared tunnel --url http://127.0.0.1:8000 --protocol http2 >/tmp/cloudflared.log 2>&1 &
+  TUNNEL_PID=$!
+  echo -n "    A aguardar URL do tunnel"
+  for i in $(seq 1 30); do
+    TUNNEL_URL=$(grep -oE 'https://[a-zA-Z0-9-]+\.trycloudflare\.com' /tmp/cloudflared.log 2>/dev/null | head -1 || true)
+    if [ -n "$TUNNEL_URL" ]; then
+      SERVER_URL="$TUNNEL_URL"
+      break
+    fi
+    echo -n "."
+    sleep 2
+  done
   echo ""
-  echo -e "  ┌─────────────────────────────────────────────┐"
-  echo -e "  │  URL PÚBLICO: ${GREEN}${TUNNEL_URL}${NC}"
-  echo -e "  │  Copia este URL para a extensão Chrome      │"
-  echo -e "  └─────────────────────────────────────────────┘"
-  echo ""
-else
-  warn "Não foi possível extrair o URL do tunnel. Verifica /tmp/cloudflared.log"
 fi
 
+echo ""
+echo -e "  ┌─────────────────────────────────────────────┐"
+echo -e "  │  URL: ${GREEN}${SERVER_URL}${NC}"
+echo -e "  │  Configura este URL na extensão Chrome      │"
+echo -e "  └─────────────────────────────────────────────┘"
+echo ""
 info "Tudo a correr. Pressiona Ctrl+C para terminar."
-wait "$TUNNEL_PID"
+
+# Manter o script vivo (wait falha se não há jobs em background)
+if [ -n "$TUNNEL_PID" ]; then
+  wait "$TUNNEL_PID"
+elif [ -n "$OLLAMA_PID" ]; then
+  wait "$OLLAMA_PID"
+else
+  sleep infinity
+fi
